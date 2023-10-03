@@ -16,14 +16,21 @@ builder.Services.AddDbContext<StoreContext>(x => x.UseSqlite(
 builder.Services.AddApplicationServices();
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-//zmiena app jest instacja WebApplication, której opcje zostały skonfigurowane w linijkach wyżej 
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200");
+    });
+});
+
+
+//WebApplication instance, which allow to add Middlewares to an app
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseStatusCodePagesWithReExecute("/errors/{0}");
-
 app.UseSwaggerDocumentation();
 
 // Configure the HTTP request pipeline only for Development environment
@@ -34,9 +41,9 @@ if (app.Environment.IsDevelopment())
     //app.UseSwaggerUI();
 }
 
-//moge uzywac przekierowania na https z http
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCors("CorsPolicy");
 app.UseAuthorization();
 
 using (var scope = app.Services.CreateScope())
@@ -55,5 +62,4 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.MapControllers();
-
 app.Run();

@@ -1,6 +1,5 @@
 ﻿using Core.Interfaces;
 using Infrastructure.Data;
-using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using API.Errors;
 
